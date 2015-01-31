@@ -1,5 +1,5 @@
 import os
-import sys.argv
+import sys
 import xml.etree.ElementTree as ET
 
 
@@ -17,6 +17,8 @@ FROM_ME = "2"
 MMS = "mms"
 SMS = "sms"
 
+ME = "Me"
+
 
 def format_text_data(contact, data):
   formatted_text = ""
@@ -28,7 +30,7 @@ def format_text_data(contact, data):
     x = y[1]
 
     if x[TYPE] == FROM_ME:
-      formatted_text += MY_NAME + ', '
+      formatted_text += ME + ', '
     else:
       formatted_text += contact + ', '
 
@@ -39,10 +41,10 @@ def format_text_data(contact, data):
   return formatted_text.encode('utf-8')
 
 
-def write_files(data_by_contact):
+def write_files(data_by_contact, recovery_date):
   for contact in data_by_contact:
     directory = contact
-    text_file = "%s/texts.txt" % contact
+    text_file = "%s/%s-texts.txt" % (contact, recovery_date)
 
     if not os.path.exists(directory):
       os.makedirs(directory)
@@ -81,18 +83,21 @@ def parse_sms_data(root):
   return sms_data
 
 
-def parse_file():
-  tree = ET.parse('sms-20150118162317.xml')
+def parse_file(file_name, recovery_date):
+  tree = ET.parse(file_name)
   root = tree.getroot()
 
   sms_data_by_contact = parse_sms_data(root)
-  write_files(sms_data_by_contact)
+  write_files(sms_data_by_contact, recovery_date)
 
 
 def parse_arguments(argv):
-  pass
+  # no error checking
+  input_file = argv[1]
+  recovery_date = input_file.split('-')[1][:8]
+  return input_file, recovery_date
 
 
 if __name__ == "__main__":
-  user_name, user_number = parse_arguments(sys.argv)
-  parse_file(user_name, user_number)
+  file_name, recovery_date = parse_arguments(sys.argv)
+  parse_file(file_name, recovery_date)
