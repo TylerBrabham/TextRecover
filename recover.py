@@ -158,9 +158,12 @@ def parse_sms_data(root):
 class MyParser(ET.XMLParser):
   def feed (self, data):
     return super(MyParser, self).feed(fix_codepoints(data.decode('utf-8'), raw=True).encode("utf-8"))
+    # return super(MyParser, self).feed(fix_codepoints(data.decode('utf-8'), raw=True).encode("utf-8"))
+    # return super(MyParser, self).feed(data)
 
 def parse_file(file_name, recovery_date):
   tree = ET.parse(file_name, parser=MyParser())  # , parser=ET.XMLParser(target=MyParser()))
+  # tree = ET.parse(file_name, parser=ET.XMLParser())
   root = tree.getroot()
 
   sms_data_by_contact = parse_sms_data(root)
@@ -223,6 +226,7 @@ def parse_arguments(argv):
   # no error checking
   input_file = argv[1]
   recovery_date = input_file.split('-')[1][:8]
+  recovery_date = '2020-12-16'
   return input_file, recovery_date
 
 
